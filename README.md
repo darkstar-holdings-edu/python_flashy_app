@@ -2,7 +2,7 @@
 
 This is repo contains code that I generate while working on the [100 Days of Code](https://www.udemy.com/course/100-days-of-code/) udemy course for learning Python.
 
-This repo covers the project for day XX of the course.
+This repo covers the project for day 31 of the course. This project is a flashcard application for learning languages. The current language setting is German.
 
 ![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/darkstar-holdings-edu/python_flashy_app)
 ![GitHub](https://img.shields.io/github/license/darkstar-holdings-edu/python_flashy_app)

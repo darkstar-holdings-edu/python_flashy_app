@@ -1,5 +1,9 @@
+from src import App
+
+
 def main() -> None:
-    pass
+    app = App(language="de")
+    app.mainloop()
 
 
 if __name__ == "__main__":

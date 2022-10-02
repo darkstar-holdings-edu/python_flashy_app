@@ -23,6 +23,10 @@ pipenv run pre-commit install -t pre-commit
 
 - `main.py`: Executable to launch the application.
 
+## Credits
+
+German translations provided by [Neri](https://frequencylists.blogspot.com/2016/01/the-2980-most-frequently-used-german.html)
+
 ## License
 
 Distributed under the MIT License. See [LICENSE](https://github.com/darkstar-holdings-edu/python_flashy_app/blob/master/LICENSE) for more information.

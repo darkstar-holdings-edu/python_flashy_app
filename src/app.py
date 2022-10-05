@@ -11,9 +11,8 @@ LANGUAGE_DATA_PATH = "data"
 class App(Tk):
     language: str
     language_pack: pd.DataFrame
-
-    words: pd.DataFrame = pd.DataFrame()
-    word_weights: list[float] = []
+    words: pd.DataFrame
+    current_word: pd.Series
 
     card: Card
 
@@ -22,10 +21,22 @@ class App(Tk):
 
         self.language = language
         self.language_pack = self.load_language_pack()
-        self.words = self.language_pack.iloc[:10]
-        self.word_weights = [0.5 for _ in range(len(self.words))]
+        self.words: pd.DataFrame = self.language_pack.iloc[:10]
+        self.words.insert(3, "known", [0 for _ in range(len(self.words.index))])
 
         self.load_user_interface()
+        self.next_question()
+
+    def load_language_pack(self) -> pd.DataFrame:
+        try:
+            df = pd.read_csv("/".join([LANGUAGE_DATA_PATH, f"{self.language}.csv"]))
+        except FileNotFoundError:
+            print(f"Invalid language pack: {self.language}")
+            exit(1)
+        else:
+            self.language_pack = df
+
+        return df.sample(frac=1).reset_index(drop=True)
 
     def load_user_interface(self) -> None:
         self.geometry("900x700")
@@ -46,28 +57,12 @@ class App(Tk):
         Button(text="Reveal", command=self.click_handler).place(x=300, y=550)
         Button(text="Next", command=self.next_question).place(x=400, y=550)
 
-        self.next_question()
-
-    def load_language_pack(self) -> pd.DataFrame:
-        try:
-            df = pd.read_csv("/".join([LANGUAGE_DATA_PATH, f"{self.language}.csv"]))
-        except FileNotFoundError:
-            print(f"Invalid language pack: {self.language}")
-            exit(1)
-        else:
-            self.language_pack = df
-
-        return df
-
     def next_question(self) -> None:
-        question = self.words.sample(
-            n=1,
-            weights=self.word_weights,
-            replace=True,
-        ).iloc[0]
+        print(self.words)
+        self.current_word = self.words[self.words["known"] == 0].iloc[0]
         self.card.update(
-            front_text=question["translation"],
-            back_text=question["english"],
+            front_text=self.current_word["translation"],
+            back_text=self.current_word["english"],
         )
 
         if self.card.is_flipped:
@@ -77,7 +72,20 @@ class App(Tk):
         self.card.flip()
 
     def wrong_handler(self) -> None:
-        print("Wrong")
+        words = self.words.copy()
+        words.loc[len(words)] = self.current_word.values.tolist()
+        self.words = words.drop(self.current_word.name).reset_index(drop=True)
+
+        self.next_question()
+
+    def add_word(self) -> None:
+        words = self.words.copy()
+        new_word = self.language_pack.iloc[len(words) + 1]
+        new_word["known"] = 0
+        words.loc[len(self.words)] = new_word
+        self.words = words
 
     def right_handler(self) -> None:
-        print("right")
+        self.words.iloc[[self.current_word.name], 3] = 1
+        self.add_word()
+        self.next_question()

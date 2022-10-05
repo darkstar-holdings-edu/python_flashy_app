@@ -1,66 +1,39 @@
-from tkinter import Canvas, PhotoImage
-
-from ..config import BACKGROUND_COLOR
+from .card_face import CardFace
 
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 526
 
 
 class Card:
-    canvas: Canvas
-    image: PhotoImage
-    x_position: int
-    y_position: int
-    label_id: int
+    front: CardFace
+    back: CardFace
+    is_flipped: bool = False
 
-    def __init__(
-        self,
-        image: str,
-        text: str,
-        color: str,
-        x_pos: int = 0,
-        y_pos: int = 0,
-    ) -> None:
-        self.image = PhotoImage(file=image)
-        self.x_position = x_pos
-        self.y_position = y_pos
-
-        canvas = Canvas(
-            width=self.image.width(),
-            height=self.image.height(),
-            background=BACKGROUND_COLOR,
-            highlightthickness=0,
+    def __init__(self) -> None:
+        self.front = CardFace(
+            image="assets/card_back.png",
+            text="Deutsch",
+            text_color="white",
         )
 
-        canvas.create_image(
-            self.image.width() // 2,
-            self.image.height() // 2,
-            image=self.image,
+        self.back = CardFace(
+            image="assets/card_front.png",
+            text="English",
+            text_color="black",
         )
 
-        canvas.create_text(
-            380,
-            175,
-            text=text,
-            fill=color,
-            font=("Helvetica", 30, "normal italic"),
-        )
+        self.front.show()
 
-        self.label_id = canvas.create_text(
-            380,
-            300,
-            text="Die Football",
-            fill=color,
-            font=("Helvetica", 45, "bold"),
-        )
+    def flip(self) -> None:
+        if not self.is_flipped:
+            self.front.hide()
+            self.back.show()
+            self.is_flipped = True
+        else:
+            self.back.hide()
+            self.front.show()
+            self.is_flipped = False
 
-        self.canvas = canvas
-
-    def update(self, text: str) -> None:
-        self.canvas.itemconfig(self.label_id, text=text)
-
-    def show(self) -> None:
-        self.canvas.place(x=self.x_position, y=self.y_position)
-
-    def hide(self) -> None:
-        self.canvas.place_forget()
+    def update(self, front_text: str, back_text: str) -> None:
+        self.front.update(text=front_text)
+        self.back.update(text=back_text)

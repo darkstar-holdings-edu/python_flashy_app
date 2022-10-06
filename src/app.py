@@ -1,4 +1,4 @@
-from tkinter import Button, Tk
+from tkinter import Tk
 import pandas as pd
 
 from .config import BACKGROUND_COLOR
@@ -54,11 +54,16 @@ class App(Tk):
             handler=self.right_handler,
         ).place(x=575, y=580, anchor="center")
 
-        Button(text="Reveal", command=self.click_handler).place(x=300, y=550)
-        Button(text="Next", command=self.next_question).place(x=400, y=550)
+    def countdown(self, count: int) -> None:
+        if count > 0:
+            self.after(1000, self.countdown, count - 1)
+        else:
+            self.card.flip()
+
+    def start_timer(self) -> None:
+        self.countdown(5)
 
     def next_question(self) -> None:
-        print(self.words)
         self.current_word = self.words[self.words["known"] == 0].iloc[0]
         self.card.update(
             front_text=self.current_word["translation"],
@@ -68,8 +73,7 @@ class App(Tk):
         if self.card.is_flipped:
             self.card.flip()
 
-    def click_handler(self) -> None:
-        self.card.flip()
+        self.start_timer()
 
     def wrong_handler(self) -> None:
         words = self.words.copy()
